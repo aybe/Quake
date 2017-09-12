@@ -66,7 +66,12 @@ void D_DrawSkyScans8 (espan_t *pspan)
 {
 	int				count, spancount, u, v;
 	unsigned char	*pdest;
-	fixed16_t		s, t, snext, tnext, sstep, tstep;
+	fixed16_t s;
+	fixed16_t t;
+	fixed16_t snext = 0;
+	fixed16_t tnext = 0;
+	fixed16_t sstep;
+	fixed16_t tstep;
 	int				spancountminus1;
 
 	sstep = 0;	// keep compiler happy
