@@ -197,6 +197,7 @@
     <ClCompile Include="net_win.c" />
     <ClCompile Include="net_wins.c" />
     <ClCompile Include="net_wipx.c" />
+    <ClCompile Include="nonintel.c" />
     <ClCompile Include="pr_cmds.c" />
     <ClCompile Include="pr_edict.c" />
     <ClCompile Include="pr_exec.c" />

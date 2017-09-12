@@ -272,7 +272,7 @@ void Sys_MakeCodeWriteable (unsigned long startaddr, unsigned long length)
 }
 
 
-#ifndef _M_IX86
+// #ifndef _M_IX86
 
 void Sys_SetFPCW (void)
 {
@@ -290,7 +290,7 @@ void MaskExceptions (void)
 {
 }
 
-#endif
+// #endif
 
 /*
 ================

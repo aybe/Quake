@@ -234,6 +234,9 @@
     <ClCompile Include="zone.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="nonintel.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="winquake.rc">
