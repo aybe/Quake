@@ -25,6 +25,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "winquake.h"
 #include "dosisms.h"
 
+#include "Config.h"
+#include <minwinbase.h>
+
+#ifdef XINPUT
+#include <XInput.h>
+#pragma comment(lib, "XInput.lib")
+static XINPUT_STATE m_xinput_state;
+#endif
+
 #define DINPUT_BUFFERSIZE           16
 #define iDirectInputCreate(a,b,c,d)	pDirectInputCreate(a,b,c,d)
 
@@ -1030,6 +1039,28 @@ void IN_Commands (void)
 IN_ReadJoystick
 =============== 
 */  
+
+#ifdef XINPUT
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/hh405053(v=vs.85).aspx
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#getting_controller_state
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#dead_zone
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#setting_vibration_effects
+
+qboolean IN_ReadJoystick(void)
+{
+	ZeroMemory(&m_xinput_state, sizeof(XINPUT_STATE));
+
+	const DWORD result = XInputGetState(0, &m_xinput_state);
+	
+	if (result != ERROR_SUCCESS)
+		return false;
+
+	return true;
+}
+
+#else
+
 qboolean IN_ReadJoystick (void)
 {
 
@@ -1059,6 +1090,7 @@ qboolean IN_ReadJoystick (void)
 	}
 }
 
+#endif
 
 /*
 ===========
