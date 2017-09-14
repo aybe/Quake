@@ -1097,6 +1097,87 @@ qboolean IN_ReadJoystick (void)
 IN_JoyMove
 ===========
 */
+
+#ifdef XINPUT
+
+void IN_JoyMove(usercmd_t *cmd)
+{
+	if (!IN_ReadJoystick())
+		return;
+
+	const XINPUT_GAMEPAD pad = m_xinput_state.Gamepad;
+	
+	// left stick
+	const float ldz = XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+	const float lxp = 3.0f;
+	const float lyp = 3.0f;
+	const float lx = pad.sThumbLX;
+	const float ly = pad.sThumbLY;
+
+	float lm = sqrt(lx*lx + ly*ly);
+	
+	const float nlx = lx / lm;
+	const float nly = ly / lm;
+	
+	float nlm;
+
+	if (lm > ldz) // is outside circular deadzone ?
+	{
+		if (lm > 32767) // clamp if necessary
+			lm = 32767;
+
+		lm -= ldz;
+		nlm = lm / (32767 - ldz);
+	}
+	else
+	{
+		lm = 0.0f;
+		nlm = 0.0f;
+	}
+
+	// right stick
+	const float rdz = XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+	const float rxp = 3.0f;
+	const float ryp = 3.0f;
+	const float rx = pad.sThumbRX * -1.0f;
+	const float ry = pad.sThumbRY * -1.0f;
+
+	float rm = sqrt(rx*rx + ry*ry);
+
+	const float nrx = rx / rm;
+	const float nry = ry / rm;
+
+	float nrm;
+
+	if (rm > rdz)
+	{
+		if (rm > 32767)
+			rm = 32767;
+
+		rm -= rdz;
+		nrm = rm / (32767 - rdz);
+	}
+	else
+	{
+		rm = 0.0f;
+		nrm = 0.0f;
+	}
+
+	// left trigger
+	const float tdz = XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
+	const float lt = pad.bLeftTrigger;
+	const float ls = lt > tdz ? cl_movespeedkey.value : 1.0f;
+
+	// apply movement
+	cmd->forwardmove += pow(nly * nlm, lyp) * joy_forwardsensitivity.value * ls * cl_forwardspeed.value;
+	cmd->sidemove += pow(nlx * nlm, lxp) * joy_sidesensitivity.value * ls * cl_sidespeed.value;
+	cl.viewangles[YAW] += pow(nrx * nrm, rxp) * joy_yawsensitivity.value * 180.0;
+	cl.viewangles[PITCH] += pow(nry* nrm, ryp) * joy_pitchsensitivity.value * 1.0f * cl_pitchspeed.value;
+	V_StopPitchDrift();
+}
+
+#else
+
 void IN_JoyMove (usercmd_t *cmd)
 {
 	float	speed, aspeed;
@@ -1269,3 +1350,6 @@ void IN_JoyMove (usercmd_t *cmd)
 	if (cl.viewangles[PITCH] < -70.0)
 		cl.viewangles[PITCH] = -70.0;
 }
+
+#endif
+
