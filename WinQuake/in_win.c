@@ -1169,10 +1169,14 @@ void IN_JoyMove(usercmd_t *cmd)
 	const float ls = lt > tdz ? cl_movespeedkey.value : 1.0f;
 
 	// apply movement
-	cmd->forwardmove += pow(nly * nlm, lyp) * joy_forwardsensitivity.value * ls * cl_forwardspeed.value;
-	cmd->sidemove += pow(nlx * nlm, lxp) * joy_sidesensitivity.value * ls * cl_sidespeed.value;
-	cl.viewangles[YAW] += pow(nrx * nrm, rxp) * joy_yawsensitivity.value * 180.0;
-	cl.viewangles[PITCH] += pow(nry* nrm, ryp) * joy_pitchsensitivity.value * 1.0f * cl_pitchspeed.value;
+	const float sens_fwd = joy_forwardsensitivity.value;
+	const float sens_side = joy_sidesensitivity.value;
+	const float sens_yaw = joy_yawsensitivity.value * 0.02f; // sensible defaults
+	const float sens_pitch = joy_pitchsensitivity.value * 0.02f;
+	cmd->forwardmove += pow(nly * nlm, lyp) * sens_fwd * ls * cl_forwardspeed.value;
+	cmd->sidemove += pow(nlx * nlm, lxp) * sens_side * ls * cl_sidespeed.value;
+	cl.viewangles[YAW] += pow(nrx * nrm, rxp) * sens_yaw * 180.0;
+	cl.viewangles[PITCH] += pow(nry * nrm, ryp) * sens_pitch * cl_pitchspeed.value;
 	V_StopPitchDrift();
 }
 
