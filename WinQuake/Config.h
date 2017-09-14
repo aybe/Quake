@@ -1,3 +1,6 @@
 #pragma once
 
-#define XINPUT
+/**
+ * \brief use XINPUT instead of WINMM for joystick
+ */
+ #define XINPUT
