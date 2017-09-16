@@ -29,9 +29,33 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <minwinbase.h>
 
 #ifdef XINPUT
+
+// https://msdn.microsoft.com/en-us/library/windows/desktop/hh405053(v=vs.85).aspx
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#getting_controller_state
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#dead_zone
+// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#setting_vibration_effects
+
+// TODO Joy_AdvancedUpdate_f
+
 #include <XInput.h>
+
 #pragma comment(lib, "XInput.lib")
+
+/**
+ * \brief state of gamepad 1
+ */
 static XINPUT_STATE m_xinput_state;
+
+/**
+ * \brief number of buttons in a device + triggers (so they can act as buttons too)
+ */
+#define XINPUT_BUTTONS 12
+
+/**
+ * \brief maximum positive value for a thumbstick
+ */
+#define XINPUT_THUMBSTICK_EXTENT 32767
+
 #endif
 
 #define DINPUT_BUFFERSIZE           16
@@ -802,7 +826,27 @@ void IN_ClearStates (void)
 =============== 
 IN_StartupJoystick 
 =============== 
-*/  
+*/
+#ifdef XINPUT
+
+void IN_StartupJoystick(void)
+{
+	joy_avail = false;
+
+	if (COM_CheckParm("-nojoy"))
+		return;
+
+	joy_numbuttons = XINPUT_BUTTONS;
+	joy_haspov = true;
+
+	joy_avail = true;
+	joy_advancedinit = false;
+
+	Con_Printf("\njoystick detected\n\n");
+}
+
+#else
+
 void IN_StartupJoystick (void) 
 { 
 	int			i, numdevs;
@@ -865,6 +909,8 @@ void IN_StartupJoystick (void)
 
 	Con_Printf ("\njoystick detected\n\n"); 
 }
+
+#endif
 
 
 /*
@@ -969,6 +1015,63 @@ void Joy_AdvancedUpdate_f (void)
 IN_Commands
 ===========
 */
+
+#ifdef XINPUT
+
+void IN_Commands(void)
+{
+	if (!joy_avail)
+		return;
+
+	const XINPUT_GAMEPAD gamepad = m_xinput_state.Gamepad;
+
+	// buttons
+	
+	const WORD w_buttons = gamepad.wButtons;
+	const qboolean b_buttons[XINPUT_BUTTONS] = {
+		w_buttons & XINPUT_GAMEPAD_A,
+		w_buttons & XINPUT_GAMEPAD_B,
+		w_buttons & XINPUT_GAMEPAD_X,
+		w_buttons & XINPUT_GAMEPAD_Y,
+		w_buttons & XINPUT_GAMEPAD_LEFT_SHOULDER,
+		w_buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER,
+		w_buttons & XINPUT_GAMEPAD_BACK,
+		w_buttons & XINPUT_GAMEPAD_START,
+		w_buttons & XINPUT_GAMEPAD_LEFT_THUMB,
+		w_buttons & XINPUT_GAMEPAD_RIGHT_THUMB,
+		gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD,
+		gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD,
+	};
+	
+	for (int i = 0; i < joy_numbuttons; i++)
+	{
+		const int key_index = i < 4 ? K_JOY1 : K_AUX1;
+		const qboolean button = b_buttons[i];
+		Key_Event(key_index + i, button);
+	}
+
+	// POV
+	
+	DWORD povstate = 0;
+		
+	if (w_buttons & XINPUT_GAMEPAD_DPAD_UP)
+		povstate |= 0x01;
+	if (w_buttons & XINPUT_GAMEPAD_DPAD_RIGHT)
+		povstate |= 0x02;
+	if (w_buttons & XINPUT_GAMEPAD_DPAD_DOWN)
+		povstate |= 0x04;
+	if (w_buttons & XINPUT_GAMEPAD_DPAD_LEFT)
+		povstate |= 0x08;
+
+	for (int i = 0; i < 4; i++)
+	{
+		const DWORD pressed = povstate & 1 << i;
+		Key_Event(K_AUX29 + i, pressed);
+	}
+}
+
+#else
+
 void IN_Commands (void)
 {
 	int		i, key_index;
@@ -1033,6 +1136,8 @@ void IN_Commands (void)
 	}
 }
 
+#endif
+
 
 /* 
 =============== 
@@ -1042,21 +1147,16 @@ IN_ReadJoystick
 
 #ifdef XINPUT
 
-// https://msdn.microsoft.com/en-us/library/windows/desktop/hh405053(v=vs.85).aspx
-// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#getting_controller_state
-// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#dead_zone
-// https://msdn.microsoft.com/en-us/library/windows/desktop/ee417001(v=vs.85).aspx#setting_vibration_effects
-
 qboolean IN_ReadJoystick(void)
 {
 	ZeroMemory(&m_xinput_state, sizeof(XINPUT_STATE));
 
 	const DWORD result = XInputGetState(0, &m_xinput_state);
 	
-	if (result != ERROR_SUCCESS)
-		return false;
+	// KISS: re-use existing code, handle disconnect state in the mean time
+	joy_avail = result == ERROR_SUCCESS;
 
-	return true;
+	return joy_avail;
 }
 
 #else
@@ -1123,11 +1223,11 @@ void IN_JoyMove(usercmd_t *cmd)
 
 	if (lm > ldz) // is outside circular deadzone ?
 	{
-		if (lm > 32767) // clamp if necessary
-			lm = 32767;
+		if (lm > XINPUT_THUMBSTICK_EXTENT) // clamp if necessary
+			lm = XINPUT_THUMBSTICK_EXTENT;
 
 		lm -= ldz;
-		nlm = lm / (32767 - ldz);
+		nlm = lm / (XINPUT_THUMBSTICK_EXTENT - ldz);
 	}
 	else
 	{
@@ -1151,11 +1251,11 @@ void IN_JoyMove(usercmd_t *cmd)
 
 	if (rm > rdz)
 	{
-		if (rm > 32767)
-			rm = 32767;
+		if (rm > XINPUT_THUMBSTICK_EXTENT)
+			rm = XINPUT_THUMBSTICK_EXTENT;
 
 		rm -= rdz;
-		nrm = rm / (32767 - rdz);
+		nrm = rm / (XINPUT_THUMBSTICK_EXTENT - rdz);
 	}
 	else
 	{
@@ -1163,18 +1263,14 @@ void IN_JoyMove(usercmd_t *cmd)
 		nrm = 0.0f;
 	}
 
-	// left trigger
-	const float tdz = XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
-	const float lt = pad.bLeftTrigger;
-	const float ls = lt > tdz ? cl_movespeedkey.value : 1.0f;
-
 	// apply movement
+	const float speed = in_speed.state & 1 ? cl_movespeedkey.value : 1.0f;
 	const float sens_fwd = joy_forwardsensitivity.value;
 	const float sens_side = joy_sidesensitivity.value;
 	const float sens_yaw = joy_yawsensitivity.value * 0.02f; // sensible defaults
 	const float sens_pitch = joy_pitchsensitivity.value * 0.02f;
-	cmd->forwardmove += pow(nly * nlm, lyp) * sens_fwd * ls * cl_forwardspeed.value;
-	cmd->sidemove += pow(nlx * nlm, lxp) * sens_side * ls * cl_sidespeed.value;
+	cmd->forwardmove += pow(nly * nlm, lyp) * sens_fwd * speed * cl_forwardspeed.value;
+	cmd->sidemove += pow(nlx * nlm, lxp) * sens_side * speed * cl_sidespeed.value;
 	cl.viewangles[YAW] += pow(nrx * nrm, rxp) * sens_yaw * 180.0;
 	cl.viewangles[PITCH] += pow(nry * nrm, ryp) * sens_pitch * cl_pitchspeed.value;
 	V_StopPitchDrift();
