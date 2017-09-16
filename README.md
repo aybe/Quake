@@ -62,6 +62,8 @@ Originally I'm a C# guy, so not exactly a C guru but I made my best to not screw
 
 This fork is targetting the Windows platform, at least for now.
 
+Development environment is Windows 10 + Visual Studio 2017, I can't promise that anything else will work.
+
 Your feedback is welcome (bugs, suggestions, etc).
 
 Good Quake-ing !
