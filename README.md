@@ -4,8 +4,10 @@ Original readme: (https://github.com/aybe/Quake/blob/master/readme.txt)
 - keep the original Quake experience intact but fix some of the annoyances on recent PCs
 - building under Visual Studio 2017
 - minimal code changes, maximum re-use of existing infrastructure/code
+- eventually make slight adjustements for today UX but through something like [DMFlags](https://zdoom.org/wiki/DMFlags)
 - proper joystick support for XBox 360/One controller, with deadzone and non-linear response for better aiming
 - added previous/next weapon commands
+- TODO audio CD playback from OGG files
 - TODO enable resolutions higher than 1280x1024 to accomdate today's screens
 - TODO fullscreen shader for things like CRT emulation
 
