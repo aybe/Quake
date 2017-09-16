@@ -3,7 +3,8 @@
 /**
  * \brief use XINPUT instead of WINMM for joystick
  */
- #define XINPUT
+#define XINPUT
+
 /**
  * \brief use 'prev/next weapon' commands instead of 'change weapon'
  */
