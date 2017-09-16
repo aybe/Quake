@@ -23,6 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "winquake.h"
 #endif
 
+#include "Config.h"
+
 void (*vid_menudrawfn)(void);
 void (*vid_menukeyfn)(int key);
 
@@ -1315,7 +1317,12 @@ void M_Options_Key (int k)
 char *bindnames[][2] =
 {
 {"+attack", 		"attack"},
+#ifndef PREV_NEXT_WEAPON
 {"impulse 10", 		"change weapon"},
+#else
+{"impulse 12", 		"previous weapon"},
+{"impulse 10", 		"next weapon"},
+#endif
 {"+jump", 			"jump / swim up"},
 {"+forward", 		"walk forward"},
 {"+back", 			"backpedal"},
