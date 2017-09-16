@@ -60,6 +60,8 @@ bind "AUX30" "impulse 10" // d-pad right, next weapon
 
 Originally I'm a C# guy, so not exactly a C guru but I made my best to not screw things up :)
 
+This fork is targetting the Windows platform, at least for now.
+
 Your feedback is welcome (bugs, suggestions, etc).
 
 Good Quake-ing !
