@@ -1,29 +1,25 @@
 Original readme: (https://github.com/aybe/Quake/blob/master/readme.txt)
 
-**The main goal/ideas of this fork are:**
-- keep the original Quake experience intact but fix some of the annoyances on recent PCs
-- building under Visual Studio 2017
-- minimal code changes, maximum re-use of existing infrastructure/code
-- eventually make slight adjustements for today UX but through something like [DMFlags](https://zdoom.org/wiki/DMFlags)
+## This fork features
+- Visual Studio 2017 project
 - proper joystick support for XBox 360/One controller, with deadzone and non-linear response for better aiming
 - added previous/next weapon commands
-- TODO audio CD playback from OGG files
-- TODO enable resolutions higher than 1280x1024 to accomdate today's screens
-- TODO fullscreen shader for things like CRT emulation
 
-So, Quake as it was back then, but bug-fixed a bit due to technogical changes in PCs.
-
-All these things are [*conditional*](https://github.com/aybe/Quake/blob/master/WinQuake/Config.h).
-
-**The changes compared to the original release:**
-- assembly optimization disabled (still runs smoothly since today's PCs are much faster)
+## This fork changes
+- assembly optimization disabled
 - OpenGL version is disabled
 
-**Binaries**
+## Notes
 
-https://github.com/aybe/Quake/releases
+### To start clean, i.e. Quake that compiles in VS2017, runs, and without any changes
 
-**Joystick**
+Start from this commit: [Uninitialized variables](https://github.com/aybe/Quake/commit/4437c317832a6ae350675ab6ffec260de956e471)
+
+## Binaries
+
+https://github.com/aybe/Quake/releases (with aforementioned features)
+
+## Joystick
 
 Here's an example of AUTOEXEC.CFG with a default layout for the XBox 360/One Controller:
 
@@ -51,19 +47,3 @@ bind "AUX12" "+attack" // right trigger
 bind "AUX32" "impulse 12" // d-pad left, previous weapon
 bind "AUX30" "impulse 10" // d-pad right, next weapon
 ```
-
-**Roadmap**
- - get SciTech MGL library to build in the same manner for enabling more resolutions
- - Quake, eat, sleep, rinse and repeat
- 
-**Notes**
-
-Originally I'm a C# guy, so not exactly a C guru but I made my best to not screw things up :)
-
-This fork is targetting the Windows platform, at least for now.
-
-Development environment is Windows 10 + Visual Studio 2017, I can't promise that anything else will work.
-
-Your feedback is welcome (bugs, suggestions, etc).
-
-Good Quake-ing !
