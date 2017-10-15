@@ -6,7 +6,7 @@ Find the original readme [here](https://github.com/aybe/Quake/blob/master/readme
 
 ## Installation instructions
 (tested under Windows 10 with the CD-ROM version of Quake that ships with DOS, Windows and OpenGL executables)
-- download the archive of the latest release: https://github.com/aybe/Quake/releases
+- download the archive of the latest release [here](https://github.com/aybe/Quake/releases)
 - unzip it to a directory of your choice, e.g. `C:\Quake`
 - from the Quake CD-ROM, copy the `ID1` directory in the `Data` directory next to the executable
 - you are now ready to run `WinQuake.exe`
@@ -17,7 +17,7 @@ Find the original readme [here](https://github.com/aybe/Quake/blob/master/readme
 
 If you didn't include `ID1\config.cfg` from the CD-ROM, the game will start but minimize itself a couple of times before finally starting. This is because on first start the game detects available display resolutions, this step however, behaves weirdly under a modern version of Windows.
 
-#### Xbox controller
+#### Xbox Controller
 
 Here's an example of AUTOEXEC.CFG with a default layout for the XBox 360/One Controller:
 
