@@ -1,8 +1,10 @@
 Find the original readme [here](https://github.com/aybe/Quake/blob/master/readme.txt).
 
-## Features
+# Features
 - proper joystick support for XBox 360/One controller, with deadzone and non-linear response for better accuracy
 - addition of  `previous` and `next` weapon commands
+
+# Installation
 
 ## Installation instructions
 (tested under Windows 10 with the CD-ROM version of Quake that ships with DOS, Windows and OpenGL executables)
@@ -11,13 +13,15 @@ Find the original readme [here](https://github.com/aybe/Quake/blob/master/readme
 - from the Quake CD-ROM, copy the `ID1` directory in the `Data` directory next to the executable
 - you are now ready to run `WinQuake.exe`
 
-### Installation notes
+## Installation notes
 
-#### Display issues
+### Display issues
 
 If you didn't include `ID1\config.cfg` from the CD-ROM, the game will start but minimize itself a couple of times before finally starting. This is because on first start the game detects available display resolutions, this step however, behaves weirdly under a modern version of Windows.
 
-#### Xbox Controller
+### Xbox Controller
+
+**This build uses XInput 1.4 which, unfortunately, is [only supported starting Windows 8](https://msdn.microsoft.com/en-us/library/windows/desktop/hh405051).**
 
 Here's an example of AUTOEXEC.CFG with a default layout for the XBox 360/One Controller:
 
